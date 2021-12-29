@@ -6,13 +6,7 @@ interface Transaction {
   amount: number;
 }
 
-interface GenesisBlock {
-  hash: string;
-  previousHash: null;
-  timestamp: Date;
-}
-
-const calculateHash = (block: Block | any): string => {
+const calculateHash = (block: Block): string => {
   const data = JSON.stringify(block.data);
   const blockData =
     data +
@@ -25,20 +19,19 @@ const calculateHash = (block: Block | any): string => {
 };
 
 class Block {
-  data: Transaction;
+  data: Transaction | null;
   hash: string;
-  previousHash: string;
+  previousHash: string | undefined;
   timestamp: Date;
   pow: number;
-  constructor(data: Transaction, previousHash: string) {
+  constructor(data: Transaction | null, previousHash: string | undefined) {
     this.data = data;
-    this.hash = ""; //todo change this!
+    this.hash = "0";
     this.previousHash = previousHash;
     this.timestamp = new Date();
     this.pow = 0;
   }
   mine(difficulty: number): void {
-    //todo implement the mine functionality
     const regex = new RegExp(`^(0){${difficulty}}.*`);
     while (!this.hash.match(regex)) {
       this.pow++;
@@ -48,24 +41,16 @@ class Block {
 }
 
 class Blockchain {
-  genesisBlock: GenesisBlock;
-  chain: Array<Block | GenesisBlock>;
+  genesisBlock: Block;
+  chain: Array<Block>;
   difficulty: number;
-  constructor(
-    genesisBlock: GenesisBlock,
-    chain: Array<Block | GenesisBlock>,
-    difficulty: number
-  ) {
+  constructor(genesisBlock: Block, chain: Array<Block>, difficulty: number) {
     this.genesisBlock = genesisBlock;
     this.chain = chain;
     this.difficulty = difficulty;
   }
   static create(difficulty: number): Blockchain {
-    const genesisBlock: GenesisBlock = {
-      hash: "0",
-      previousHash: null,
-      timestamp: new Date(),
-    };
+    const genesisBlock = new Block(null, undefined);
     return new Blockchain(genesisBlock, [genesisBlock], difficulty);
   }
   addBlock(from: string, to: string, amount: number): void {
@@ -77,9 +62,9 @@ class Blockchain {
   }
   isValid(): boolean {
     if (this.chain.length === 1) return true;
-    for (let i = 1; i < this.chain.length - 1; i++) {
-      const currentBlock = this.chain[i];
-      const nextBlock = this.chain[i + 1];
+    for (let index = 1; index < this.chain.length - 1; index++) {
+      const currentBlock = this.chain[index];
+      const nextBlock = this.chain[index + 1];
       if (
         currentBlock.hash !== calculateHash(currentBlock) ||
         nextBlock.previousHash !== currentBlock.hash
@@ -91,9 +76,11 @@ class Blockchain {
 }
 
 (function () {
-  const blockchain = Blockchain.create(3);
+  const blockchain = Blockchain.create(5); // difficulty increases exponentially with each increase
   blockchain.addBlock("Alice", "Bob", 5);
   blockchain.addBlock("John", "Doe", 100);
   console.log(blockchain);
   console.log(blockchain.isValid());
+  blockchain.chain[1].timestamp = new Date(); // tampering with the blockchain
+  console.log(blockchain.isValid()); // should return false because I have tampered with the blockchain
 })();
