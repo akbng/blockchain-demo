@@ -39,6 +39,11 @@ class Block {
   }
   mine(difficulty: number): void {
     //todo implement the mine functionality
+    const regex = new RegExp(`^(0){${difficulty}}.*`);
+    while (!this.hash.match(regex)) {
+      this.pow++;
+      this.hash = calculateHash(this);
+    }
   }
 }
 
@@ -55,7 +60,7 @@ class Blockchain {
     this.chain = chain;
     this.difficulty = difficulty;
   }
-  static create(difficulty: number) {
+  static create(difficulty: number): Blockchain {
     const genesisBlock: GenesisBlock = {
       hash: "0",
       previousHash: null,
@@ -63,15 +68,18 @@ class Blockchain {
     };
     return new Blockchain(genesisBlock, [genesisBlock], difficulty);
   }
-  addBlock(from: string, to: string, amount: number) {
+  addBlock(from: string, to: string, amount: number): void {
     const blockData: Transaction = { from, to, amount };
     const lastBlock = this.chain[this.chain.length - 1];
     const newBlock: Block = new Block(blockData, lastBlock.hash);
     newBlock.mine(this.difficulty);
-    return new Blockchain(
-      this.genesisBlock,
-      [...this.chain, newBlock],
-      this.difficulty
-    );
+    this.chain.push(newBlock);
   }
 }
+
+(function () {
+  const blockchain = Blockchain.create(3);
+  blockchain.addBlock("Alice", "Bob", 5);
+  blockchain.addBlock("John", "Doe", 100);
+  console.log(blockchain);
+})();
