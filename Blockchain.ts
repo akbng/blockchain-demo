@@ -38,12 +38,9 @@ class Block {
     this.pow = 0;
   }
   mine(difficulty: number): void {
-    //todo implement the hashing function then the mining function.
+    //todo implement the mine functionality
   }
 }
-
-const block = new Block({ from: "ankan", to: "baby", amount: 10000 }, "0000");
-console.log(block);
 
 class Blockchain {
   genesisBlock: GenesisBlock;
