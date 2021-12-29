@@ -12,7 +12,7 @@ interface GenesisBlock {
   timestamp: Date;
 }
 
-const calculateHash = (block: Block): string => {
+const calculateHash = (block: Block | any): string => {
   const data = JSON.stringify(block.data);
   const blockData =
     data +
@@ -75,6 +75,19 @@ class Blockchain {
     newBlock.mine(this.difficulty);
     this.chain.push(newBlock);
   }
+  isValid(): boolean {
+    if (this.chain.length === 1) return true;
+    for (let i = 1; i < this.chain.length - 1; i++) {
+      const currentBlock = this.chain[i];
+      const nextBlock = this.chain[i + 1];
+      if (
+        currentBlock.hash !== calculateHash(currentBlock) ||
+        nextBlock.previousHash !== currentBlock.hash
+      )
+        return false;
+    }
+    return true;
+  }
 }
 
 (function () {
@@ -82,4 +95,5 @@ class Blockchain {
   blockchain.addBlock("Alice", "Bob", 5);
   blockchain.addBlock("John", "Doe", 100);
   console.log(blockchain);
+  console.log(blockchain.isValid());
 })();
