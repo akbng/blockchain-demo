@@ -1,44 +1,5 @@
-const { createHash } = require("crypto");
-
-interface Transaction {
-  from: string;
-  to: string;
-  amount: number;
-}
-
-const calculateHash = (block: Block): string => {
-  const data = JSON.stringify(block.data);
-  const blockData =
-    data +
-    block.previousHash +
-    block.timestamp.toISOString() +
-    block.pow.toString();
-  const hash = createHash("sha256");
-  hash.update(blockData);
-  return hash.digest("hex");
-};
-
-class Block {
-  data: Transaction | null;
-  hash: string;
-  previousHash: string | undefined;
-  timestamp: Date;
-  pow: number;
-  constructor(data: Transaction | null, previousHash: string | undefined) {
-    this.data = data;
-    this.hash = "0";
-    this.previousHash = previousHash;
-    this.timestamp = new Date();
-    this.pow = 0;
-  }
-  mine(difficulty: number): void {
-    const regex = new RegExp(`^(0){${difficulty}}.*`);
-    while (!this.hash.match(regex)) {
-      this.pow++;
-      this.hash = calculateHash(this);
-    }
-  }
-}
+import Transaction, { calculateHash } from "./utils";
+import Block from "./Block";
 
 class Blockchain {
   genesisBlock: Block;
@@ -75,12 +36,4 @@ class Blockchain {
   }
 }
 
-(function () {
-  const blockchain = Blockchain.create(5); // difficulty increases exponentially with each increase
-  blockchain.addBlock("Alice", "Bob", 5);
-  blockchain.addBlock("John", "Doe", 100);
-  console.log(blockchain);
-  console.log(blockchain.isValid());
-  blockchain.chain[1].timestamp = new Date(); // tampering with the blockchain
-  console.log(blockchain.isValid()); // should return false because I have tampered with the blockchain
-})();
+export default Blockchain;
