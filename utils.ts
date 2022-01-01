@@ -14,9 +14,7 @@ export const calculateHash = (block: Block): string => {
     block.previousHash +
     block.timestamp.toISOString() +
     block.pow.toString();
-  const hash = createHash("sha256");
-  hash.update(blockData);
-  return hash.digest("hex");
+  return createHash("sha256").update(blockData).digest("hex");
 };
 
 export default Transaction;

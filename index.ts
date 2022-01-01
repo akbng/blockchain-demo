@@ -1,7 +1,7 @@
 import Blockchain from "./Blockchain";
 
 (function () {
-  const blockchain = Blockchain.create(5); // difficulty increases exponentially with each increase
+  const blockchain = Blockchain.create(3); // difficulty increases exponentially with each increase
   blockchain.addBlock("Alice", "Bob", 5);
   blockchain.addBlock("John", "Doe", 100);
   console.log(blockchain);
