@@ -4,7 +4,9 @@
 
 This is a bare minimum implementation of the blockchain functionality using TypeScript for educational purpose.
 
-### The [index.ts]()
+configure the function inside the `index.ts` to configure the blockchain instance.
+
+This repository is part of a tutorial in [Medium]()
 
 ## How to use
 
