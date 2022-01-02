@@ -1,4 +1,4 @@
-import Blockchain from "./Blockchain";
+import Blockchain from "./src/Blockchain";
 
 (function () {
   const blockchain = Blockchain.create(3); // difficulty increases exponentially with each increase
