@@ -1,4 +1,5 @@
 const readlineSync = require("readline-sync");
+import Block from "./src/Block";
 import Blockchain from "./src/Blockchain";
 
 const usage = `
@@ -17,6 +18,19 @@ const usage = `
 let input: string;
 console.log(usage);
 
+const format = (chain: Array<Block>, limit: number) => {
+  let string = "";
+  const isLongList = chain.length > limit;
+  const newChain = chain.slice(isLongList ? chain.length - limit : 0);
+  newChain.forEach((block, index) => {
+    if (index == 0 && !isLongList) return;
+    string += `\n[${index + (isLongList ? 1 : 0)}]\tSender: ${
+      block.data?.from
+    }\tReceiver: ${block.data?.to}\tAmount-Transfered: ${block.data?.amount}`;
+  });
+  return string;
+};
+
 const blockchain = Blockchain.create(2);
 
 do {
@@ -24,30 +38,38 @@ do {
   const commands = input.split(" ");
   const command = commands[0];
   const length = commands.length;
+  const outputLimit = 10;
   switch (command) {
     case "add":
       if (length !== 4) {
         console.log("<- WRONG NUMBER OF ARGUMENTS!");
         continue;
       }
-      blockchain.addBlock(commands[1], commands[2], parseFloat(commands[3]));
+      const amount = parseFloat(commands[3]);
+      if (isNaN(amount)) {
+        console.log("<- Please give a correct Amount");
+        continue;
+      }
+      blockchain.addBlock(commands[1], commands[2], amount);
       break;
-    // todo format show output and limit to last 10
     case "show":
       process.stdout.write("<- ");
-      console.log(blockchain.chain);
+      console.log(format(blockchain.chain, outputLimit));
       break;
     case "tamper":
       if (length !== 2) {
         console.log("<- WRONG NUMBER OF ARGUMENTS :(");
         continue;
       }
-      const index = parseInt(commands[1]) - 1;
-      if (index < 0 || index >= blockchain.chain.length) {
+      const index = parseInt(commands[1]);
+      if (index < 1 || index > outputLimit) {
         console.log("<- WRONG INDEX FOR BLOCK");
         continue;
       }
-      blockchain.chain[index].pow = 0;
+      const chainLength = blockchain.chain.length;
+      const changeIndex =
+        index + chainLength > outputLimit ? chainLength - outputLimit - 1 : 0;
+      blockchain.chain[changeIndex].pow = 0;
       break;
     case "check":
       console.log(
