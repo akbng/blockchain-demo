@@ -23,12 +23,12 @@ class Blockchain {
   }
   isValid(): boolean {
     if (this.chain.length === 1) return true;
-    for (let index = 1; index < this.chain.length - 1; index++) {
+    for (let index = 1; index < this.chain.length; index++) {
       const currentBlock = this.chain[index];
-      const nextBlock = this.chain[index + 1];
+      const previousBlock = this.chain[index - 1];
       if (
         currentBlock.hash !== calculateHash(currentBlock) ||
-        nextBlock.previousHash !== currentBlock.hash
+        previousBlock.hash !== currentBlock.previousHash
       )
         return false;
     }
