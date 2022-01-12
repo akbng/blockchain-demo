@@ -69,7 +69,7 @@ do {
       const chainLength = blockchain.chain.length;
       const changeIndex =
         index + chainLength > outputLimit ? chainLength - outputLimit - 1 : 0;
-      blockchain.chain[changeIndex].pow = 0;
+      blockchain.chain[changeIndex].timestamp = new Date();
       break;
     case "check":
       console.log(
